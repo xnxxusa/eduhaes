@@ -1,0 +1,83 @@
+`index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+</head>
+
+<body>
+
+<div id="content">Loading...</div>
+
+<script>
+(function () {
+
+    const params = new URLSearchParams(window.location.search);
+    const file = params.get("file");
+
+    if (!file) {
+        document.getElementById("content").textContent = "File not specified.";
+        return;
+    }
+
+    // Only allow a simple filename.
+    // Prevents paths such as ../something
+    if (!/^[A-Za-z0-9_-]+$/.test(file)) {
+        document.getElementById("content").textContent = "Invalid file name.";
+        return;
+    }
+
+    const fileUrl = "./" + file + ".html";
+
+    fetch(fileUrl)
+        .then(function (response) {
+
+            if (!response.ok) {
+                throw new Error("File not found");
+            }
+
+            return response.text();
+        })
+        .then(function (html) {
+
+            document.open();
+            document.write(html);
+            document.close();
+
+        })
+        .catch(function (error) {
+
+            console.error(error);
+
+            document.open();
+            document.write("File not found.");
+            document.close();
+
+        });
+
+})();
+</script>
+
+</body>
+</html>
+```
+
+Example:
+
+```text
+https://YOUR-USERNAME.github.io/YOUR-REPO/?file=abc
+```
+
+এটা automatically:
+
+```text
+abc.html
+```
+
+fetch করবে এবং তার HTML browser-এ দেখাবে।
+
+তোমার আগের `conn.php`-এর equivalent আর লাগবে না।
