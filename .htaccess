@@ -1,0 +1,38 @@
+
+# ================================================================
+# STP Batch HTML Generator — /post/ folder hardening
+# Apache / LiteSpeed (Hostinger, cPanel). Nginx হলে নিচের note দেখো।
+# ================================================================
+
+# ── config.php কেউ browser দিয়ে খুলতে পারবে না ──
+<Files "config.php">
+  Require all denied
+</Files>
+
+# ── Directory listing বন্ধ ──
+Options -Indexes
+
+# ── ZIP টা যেন browser-এ না খুলে, download হয় ──
+<FilesMatch "\.zip$">
+  Header set Content-Disposition "attachment"
+  Header set X-Robots-Tag "noindex"
+</FilesMatch>
+
+# ── Upload limit (server allow করলে) ──
+<IfModule mod_php.c>
+  php_value upload_max_filesize 64M
+  php_value post_max_size 68M
+</IfModule>
+
+# ── Basic security headers ──
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# ================================================================
+# NGINX ব্যবহার করলে server block-এ এটা দাও:
+#
+#   location = /post/config.php { deny all; }
+#   location ~ ^/post/.*\.zip$  { add_header Content-Disposition attachment; }
+#   client_max_body_size 68M;
+# ================================================================
